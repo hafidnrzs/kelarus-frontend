@@ -1,0 +1,3 @@
+# shared packages
+# - api-client/  typed-client generated from the API contract
+# - ui/          optional: shared design tokens/components
