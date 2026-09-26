@@ -1,6 +1,8 @@
 import { KeyRoundIcon, LogOutIcon, UserIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 import { Link, Outlet, useNavigate } from "react-router"
 
+import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -17,6 +19,7 @@ import { useSession } from "@/features/auth/session-context"
 export function AppLayout() {
   const { session, signOut } = useSession()
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -24,26 +27,29 @@ export function AppLayout() {
         <Link to="/" className="text-lg font-semibold tracking-tight">
           KELARUS
         </Link>
-        <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
-            <UserIcon />
-            <span className="max-w-48 truncate">{session?.email}</span>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="truncate">{session?.email}</DropdownMenuLabel>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate("/settings/password")}>
-              <KeyRoundIcon />
-              Change password
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => void signOut()}>
-              <LogOutIcon />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+              <UserIcon />
+              <span className="max-w-48 truncate">{session?.email}</span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel className="truncate">{session?.email}</DropdownMenuLabel>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/settings/password")}>
+                <KeyRoundIcon />
+                {t("userMenu.changePassword")}
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onClick={() => void signOut()}>
+                <LogOutIcon />
+                {t("userMenu.signOut")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </header>
       <main className="flex-1 p-4 md:p-6">
         <Outlet />

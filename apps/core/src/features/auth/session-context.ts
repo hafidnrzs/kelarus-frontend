@@ -1,9 +1,11 @@
 import { createContext, use } from "react"
 
+import type { MessageKey } from "@/i18n"
+
 import type { StoredSession } from "./session-storage"
 
 /** Why the user left the protected area; the guard turns it into a Login notice. */
-export type SignOutExit = { notice?: string }
+export type SignOutExit = { notice?: MessageKey }
 
 type SessionContextValue = {
   session: StoredSession | null

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
 
 import './index.css'
+import './i18n'
 import { router } from './app/router'
 import { SessionProvider } from './features/auth/session'
 

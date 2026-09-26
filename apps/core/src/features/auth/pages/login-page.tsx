@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react"
+import { useTranslation } from "react-i18next"
 import { Link, useLocation } from "react-router"
 
 import {
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import type { MessageKey } from "@/i18n"
 
 import { FormAlert } from "../components/form-alert"
 import { FormField } from "../components/form-field"
@@ -16,23 +18,22 @@ import type { LoginLocationState } from "../components/route-guards"
 import { SubmitButton } from "../components/submit-button"
 import { useSession } from "../session-context"
 import { ApiError } from "../types"
-import { hasErrors, validateEmail, type FieldErrors } from "../validation"
+import { hasErrors, message, validateEmail, type FieldErrors } from "../validation"
 
-function errorMessage(error: unknown) {
+function errorMessage(error: unknown): MessageKey {
   if (error instanceof ApiError) {
-    if (error.code === "INVALID_CREDENTIALS") return "Wrong email or password."
-    if (error.code === "ACCOUNT_NOT_ACTIVE") {
-      return "Your account is not active yet. Open the verification link we sent to your email, then sign in again."
-    }
+    if (error.code === "INVALID_CREDENTIALS") return "login.invalidCredentials"
+    if (error.code === "ACCOUNT_NOT_ACTIVE") return "login.accountNotActive"
   }
-  return "Something went wrong. Please try again."
+  return "common.somethingWentWrong"
 }
 
 export function LoginPage() {
+  const { t } = useTranslation()
   const { signIn } = useSession()
   const notice = (useLocation().state as LoginLocationState)?.notice
   const [errors, setErrors] = useState<FieldErrors<"email" | "password">>({})
-  const [formError, setFormError] = useState<string>()
+  const [formError, setFormError] = useState<MessageKey>()
   const [pending, setPending] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -43,7 +44,7 @@ export function LoginPage() {
 
     const nextErrors = {
       email: validateEmail(email),
-      password: password ? undefined : "Enter your password.",
+      password: password ? undefined : message("validation.passwordRequired"),
     }
     setErrors(nextErrors)
     setFormError(undefined)
@@ -62,16 +63,16 @@ export function LoginPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
-        <CardDescription>Enter your email and password to continue.</CardDescription>
+        <CardTitle>{t("login.title")}</CardTitle>
+        <CardDescription>{t("login.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit} className="grid gap-4">
-          {notice && !formError && <FormAlert variant="success">{notice}</FormAlert>}
-          {formError && <FormAlert>{formError}</FormAlert>}
+          {notice && !formError && <FormAlert variant="success">{t(notice)}</FormAlert>}
+          {formError && <FormAlert>{t(formError)}</FormAlert>}
           <FormField
             name="email"
-            label="Email"
+            label={t("fields.email")}
             type="email"
             autoComplete="email"
             error={errors.email}
@@ -79,7 +80,7 @@ export function LoginPage() {
           <div className="grid gap-2">
             <FormField
               name="password"
-              label="Password"
+              label={t("fields.password")}
               type="password"
               autoComplete="current-password"
               error={errors.password}
@@ -88,17 +89,17 @@ export function LoginPage() {
               to="/forgot-password"
               className="justify-self-end text-sm text-muted-foreground underline-offset-4 hover:underline"
             >
-              Forgot password?
+              {t("login.forgotPassword")}
             </Link>
           </div>
-          <SubmitButton pending={pending}>Sign in</SubmitButton>
+          <SubmitButton pending={pending}>{t("login.submit")}</SubmitButton>
         </form>
       </CardContent>
       <CardFooter className="justify-center text-muted-foreground">
         <span>
-          No account yet?{" "}
+          {t("login.noAccount")}{" "}
           <Link to="/register" className="text-foreground underline underline-offset-4">
-            Create one
+            {t("login.createAccount")}
           </Link>
         </span>
       </CardFooter>

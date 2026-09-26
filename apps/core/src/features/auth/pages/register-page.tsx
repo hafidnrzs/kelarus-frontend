@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react"
+import { useTranslation } from "react-i18next"
 import { Link, useNavigate } from "react-router"
 
 import {
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import type { MessageKey } from "@/i18n"
 
 import * as api from "../api"
 import { FormAlert } from "../components/form-alert"
@@ -25,19 +27,20 @@ import {
 
 export type RegisterSuccessState = { email: string }
 
-function errorMessage(error: unknown) {
+function errorMessage(error: unknown): MessageKey {
   if (error instanceof ApiError && error.code === "EMAIL_ALREADY_REGISTERED") {
-    return "This email is already registered. Sign in instead, or reset your password."
+    return "register.emailTaken"
   }
-  return "Something went wrong. Please try again."
+  return "common.somethingWentWrong"
 }
 
 export function RegisterPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [errors, setErrors] = useState<
     FieldErrors<"email" | "password" | "confirmPassword">
   >({})
-  const [formError, setFormError] = useState<string>()
+  const [formError, setFormError] = useState<MessageKey>()
   const [pending, setPending] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -70,41 +73,41 @@ export function RegisterPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
-        <CardDescription>We will send a verification link to your email.</CardDescription>
+        <CardTitle>{t("register.title")}</CardTitle>
+        <CardDescription>{t("register.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit} className="grid gap-4">
-          {formError && <FormAlert>{formError}</FormAlert>}
+          {formError && <FormAlert>{t(formError)}</FormAlert>}
           <FormField
             name="email"
-            label="Email"
+            label={t("fields.email")}
             type="email"
             autoComplete="email"
             error={errors.email}
           />
           <FormField
             name="password"
-            label="Password"
+            label={t("fields.password")}
             type="password"
             autoComplete="new-password"
             error={errors.password}
           />
           <FormField
             name="confirmPassword"
-            label="Confirm password"
+            label={t("fields.confirmPassword")}
             type="password"
             autoComplete="new-password"
             error={errors.confirmPassword}
           />
-          <SubmitButton pending={pending}>Create account</SubmitButton>
+          <SubmitButton pending={pending}>{t("register.submit")}</SubmitButton>
         </form>
       </CardContent>
       <CardFooter className="justify-center text-muted-foreground">
         <span>
-          Already have an account?{" "}
+          {t("register.haveAccount")}{" "}
           <Link to="/login" className="text-foreground underline underline-offset-4">
-            Sign in
+            {t("register.signIn")}
           </Link>
         </span>
       </CardFooter>

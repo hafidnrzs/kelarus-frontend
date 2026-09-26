@@ -1,8 +1,10 @@
 import { Navigate, Outlet, useLocation } from "react-router"
 
+import type { MessageKey } from "@/i18n"
+
 import { useSession } from "../session-context"
 
-export type LoginLocationState = { from?: string; notice?: string } | null
+export type LoginLocationState = { from?: string; notice?: MessageKey } | null
 
 /** Renders child routes only for signed-out users; others go back where they came from. */
 export function GuestRoute() {

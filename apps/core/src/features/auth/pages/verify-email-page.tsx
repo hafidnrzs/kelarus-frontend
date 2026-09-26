@@ -5,6 +5,7 @@ import {
   Loader2Icon,
 } from "lucide-react"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useTranslation } from "react-i18next"
 import { Link, useSearchParams } from "react-router"
 
 import { Button } from "@/components/ui/button"
@@ -15,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import type { MessageKey } from "@/i18n"
 
 import * as api from "../api"
 import { ApiError } from "../types"
@@ -24,27 +26,25 @@ type Status = "loading" | "success" | "invalid" | "expired"
 const CONTENT = {
   loading: {
     icon: <Loader2Icon className="mb-2 size-8 animate-spin text-muted-foreground" />,
-    title: "Verifying your email",
-    description: "This only takes a moment.",
+    title: "verifyEmail.loadingTitle",
+    description: "verifyEmail.loadingDescription",
   },
   success: {
     icon: <CircleCheckIcon className="mb-2 size-8 text-primary" />,
-    title: "Email verified",
-    description: "Your account is active. You can sign in now.",
+    title: "verifyEmail.successTitle",
+    description: "verifyEmail.successDescription",
   },
   invalid: {
     icon: <CircleXIcon className="mb-2 size-8 text-destructive" />,
-    title: "Invalid link",
-    description:
-      "This verification link is not valid. Make sure you opened the full link from your email.",
+    title: "verifyEmail.invalidTitle",
+    description: "verifyEmail.invalidDescription",
   },
   expired: {
     icon: <ClockAlertIcon className="mb-2 size-8 text-destructive" />,
-    title: "Link expired",
-    description:
-      "Verification links are valid for 24 hours. Contact support to get a new one.",
+    title: "verifyEmail.expiredTitle",
+    description: "verifyEmail.expiredDescription",
   },
-} satisfies Record<Status, { icon: ReactNode; title: string; description: string }>
+} satisfies Record<Status, { icon: ReactNode; title: MessageKey; description: MessageKey }>
 
 export function VerifyEmailPage() {
   const token = useSearchParams()[0].get("token") ?? ""
@@ -53,6 +53,7 @@ export function VerifyEmailPage() {
 }
 
 function VerifyEmailStatus({ token }: { token: string }) {
+  const { t } = useTranslation()
   const [status, setStatus] = useState<Status>("loading")
   const submittedToken = useRef<string | null>(null)
 
@@ -76,8 +77,8 @@ function VerifyEmailStatus({ token }: { token: string }) {
     <Card>
       <CardHeader className="justify-items-center text-center">
         {content.icon}
-        <CardTitle>{content.title}</CardTitle>
-        <CardDescription>{content.description}</CardDescription>
+        <CardTitle>{t(content.title)}</CardTitle>
+        <CardDescription>{t(content.description)}</CardDescription>
       </CardHeader>
       {status !== "loading" && (
         <CardContent>
@@ -88,7 +89,7 @@ function VerifyEmailStatus({ token }: { token: string }) {
             nativeButton={false}
             render={<Link to="/login" />}
           >
-            Go to sign in
+            {t("common.goToSignIn")}
           </Button>
         </CardContent>
       )}

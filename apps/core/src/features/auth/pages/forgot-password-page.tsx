@@ -1,5 +1,6 @@
 import { MailCheckIcon } from "lucide-react"
 import { useState, type FormEvent } from "react"
+import { useTranslation } from "react-i18next"
 import { Link } from "react-router"
 
 import { Button } from "@/components/ui/button"
@@ -16,11 +17,12 @@ import * as api from "../api"
 import { FormAlert } from "../components/form-alert"
 import { FormField } from "../components/form-field"
 import { SubmitButton } from "../components/submit-button"
-import { validateEmail } from "../validation"
+import { validateEmail, type Message } from "../validation"
 
 export function ForgotPasswordPage() {
-  const [emailError, setEmailError] = useState<string>()
-  const [formError, setFormError] = useState<string>()
+  const { t } = useTranslation()
+  const [emailError, setEmailError] = useState<Message>()
+  const [failed, setFailed] = useState(false)
   const [pending, setPending] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
@@ -30,7 +32,7 @@ export function ForgotPasswordPage() {
 
     const error = validateEmail(email)
     setEmailError(error)
-    setFormError(undefined)
+    setFailed(false)
     if (error) return
 
     setPending(true)
@@ -38,7 +40,7 @@ export function ForgotPasswordPage() {
       await api.forgotPassword(email)
       setSubmitted(true)
     } catch {
-      setFormError("Something went wrong. Please try again.")
+      setFailed(true)
     } finally {
       setPending(false)
     }
@@ -50,11 +52,8 @@ export function ForgotPasswordPage() {
       <Card>
         <CardHeader className="justify-items-center text-center">
           <MailCheckIcon className="mb-2 size-8 text-primary" />
-          <CardTitle>Check your email</CardTitle>
-          <CardDescription>
-            If an account exists for that email, we sent a link to reset your
-            password. The link is valid for 30 minutes.
-          </CardDescription>
+          <CardTitle>{t("forgotPassword.sentTitle")}</CardTitle>
+          <CardDescription>{t("forgotPassword.sentDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button
@@ -64,7 +63,7 @@ export function ForgotPasswordPage() {
             nativeButton={false}
             render={<Link to="/login" />}
           >
-            Back to sign in
+            {t("common.backToSignIn")}
           </Button>
         </CardContent>
       </Card>
@@ -74,22 +73,20 @@ export function ForgotPasswordPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Forgot password</CardTitle>
-        <CardDescription>
-          Enter your email and we will send you a link to reset your password.
-        </CardDescription>
+        <CardTitle>{t("forgotPassword.title")}</CardTitle>
+        <CardDescription>{t("forgotPassword.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form noValidate onSubmit={handleSubmit} className="grid gap-4">
-          {formError && <FormAlert>{formError}</FormAlert>}
+          {failed && <FormAlert>{t("common.somethingWentWrong")}</FormAlert>}
           <FormField
             name="email"
-            label="Email"
+            label={t("fields.email")}
             type="email"
             autoComplete="email"
             error={emailError}
           />
-          <SubmitButton pending={pending}>Send reset link</SubmitButton>
+          <SubmitButton pending={pending}>{t("forgotPassword.submit")}</SubmitButton>
         </form>
       </CardContent>
       <CardFooter className="justify-center">
@@ -97,7 +94,7 @@ export function ForgotPasswordPage() {
           to="/login"
           className="text-muted-foreground underline-offset-4 hover:underline"
         >
-          Back to sign in
+          {t("common.backToSignIn")}
         </Link>
       </CardFooter>
     </Card>
