@@ -7,3 +7,6 @@ node_modules/
 
 # macOS-specific files
 .DS_Store
+
+# Personal drafts
+docs/scratch/
